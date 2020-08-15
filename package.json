@@ -20,12 +20,15 @@
     }
   },
   "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "morgan": "^1.10.0",
     "pg": "^8.3.0",
-    "sequelize": "^6.3.4"
+    "sequelize": "^6.3.4",
+    "winston": "^3.3.3"
   },
   "devDependencies": {
-    "dotenv": "^8.2.0",
     "eslint": "^7.6.0",
     "eslint-config-leapfrog": "^3.0.0",
     "eslint-config-prettier": "^6.11.0",
@@ -33,7 +36,6 @@
     "husky": "^4.2.5",
     "jest": "^26.3.0",
     "lint-staged": "^10.2.11",
-    "morgan": "^1.10.0",
     "prettier": "^2.0.5"
   }
 }
