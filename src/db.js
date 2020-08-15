@@ -1,6 +1,8 @@
-const Pool = require('pg').Pool;
+const { Pool } = require('pg');
 
-const connection = {
+require('./config');
+
+const dbConfig = {
   user: process.env.DB_USER,
   port: process.env.DB_PORT,
   host: process.env.DB_HOST,
@@ -8,6 +10,6 @@ const connection = {
   password: process.env.DB_PASSWORD,
 };
 
-const db = new Pool(connection);
+const pool = new Pool(dbConfig);
 
-module.exports = db;
+module.exports = pool;
