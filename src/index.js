@@ -5,6 +5,7 @@ const morgan = require('morgan');
 const routes = require('./routes');
 
 const logger = require('./utils/logger');
+const errorHandler = require('./middlewares/errorHandler');
 
 require('./config');
 
@@ -13,26 +14,18 @@ app.set('port', process.env.APP_PORT);
 
 // Middleware
 app.use(morgan('dev'));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // API Routes
 app.use('/api', routes);
 
-// pool
-//   .connect()
-//   .then((client) => {
-//     client
-//       .query('CREATE TABLE IF NOT EXISTS test(role_id serial PRIMARY KEY, role_name VARCHAR (255) UNIQUE NOT NULL)')
-//       .then(() => {
-//         logger.info('Table created success ');
-//       })
-//       .catch((err) => {
-//         logger.error(err);
-//       });
-//   })
-//   .catch((err) => {
-//     logger.error('TTTT' + err);
-//   });
+app.get('/', (req, res) => res.json({ success: 'okay', msg: 'Hello API' }));
 
-app.get('/', (req, res) => res.send('Hello API'));
+app.use(errorHandler.genericErrorHandler);
+// app.use(errorHandler.methodNotAllowed);
+app.use(errorHandler.notFound);
 
-app.listen(app.get('port'), app.get('host'), () => logger.info(`Example app listening on port port!`));
+app.listen(app.get('port'), app.get('host'), () =>
+  logger.info(`Server running on http://${app.get('host')}:${app.get('port')}`),
+);
