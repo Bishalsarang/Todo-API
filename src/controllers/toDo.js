@@ -28,7 +28,6 @@ const search = async (req, res, next) => {
 /**
  * Add todo.
  *
- *
  * @param {Object} req
  * @param {Object} res
  * @param {Function} next
@@ -47,4 +46,50 @@ const add = async (req, res, next) => {
   res.json({ success: true });
 };
 
-module.exports = { search, add };
+const readToDo = async (req, res, next) => {
+  const sqlQuery = 'SELECT * FROM todos where todo_id=$1';
+  const values = [req.params.id];
+
+  try {
+    const result = await pool.query(sqlQuery, values);
+
+    res.json({ success: true, row: result.rows[0] });
+  } catch (err) {
+    next(err);
+  }
+};
+
+const deleteToDo = async (req, res, next) => {
+  const sqlQuery = 'DELETE FROM todos where todo_id=$1';
+  const values = [req.params.id];
+
+  try {
+    await pool.query(sqlQuery, values);
+    res.json({ success: true });
+  } catch (err) {
+    next(err);
+  }
+};
+
+const updateToDo = async (req, res, next) => {
+  const sqlQuery = 'UPDATE todos SET title=$1, is_complete=$2 WHERE todo_id=$3';
+
+  const { title, is_complete: isComplete } = req.body;
+
+  const values = [title, isComplete, req.params.id];
+
+  try {
+    await pool.query(sqlQuery, values);
+    res.json({ success: true });
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports = {
+  add,
+  search,
+  readToDo,
+  deleteToDo,
+  updateToDo,
+};

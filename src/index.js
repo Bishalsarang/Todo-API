@@ -23,7 +23,9 @@ app.use(express.urlencoded({ extended: true }));
 // API Routes
 app.use('/api', routes);
 
-app.get('/', (req, res) => res.json({ success: true, msg: 'Hello API' }));
+app.get('/', (req, res) => {
+  res.json({ success: true, msg: 'Hello API' });
+});
 
 app.use(errorHandler.genericErrorHandler);
 // app.use(errorHandler.methodNotAllowed);

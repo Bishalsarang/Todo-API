@@ -5,8 +5,3 @@ CREATE TABLE IF NOT EXISTS todos (
    is_complete BOOLEAN,
    description TEXT
 );
-
-INSERT INTO
-   todos(title, is_complete, description)
-VALUES
-   ("Hw garna xa", false, "hi");

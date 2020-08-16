@@ -1,5 +1,7 @@
 const HttpStatus = require('http-status-codes');
 
+const logger = require('../utils/logger');
+
 const notFound = (req, res) => {
   res.status(HttpStatus.NOT_FOUND).json({
     error: {
@@ -19,8 +21,12 @@ const methodNotAllowed = (req, res) => {
 };
 
 const genericErrorHandler = (err, req, res, next) => {
-  //   console.log('here');
-  res.status(404).json({ err });
+  logger.error(err.message);
+  if (!err.statusCode) {
+    err.statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
+    err.message = HttpStatus.getStatusText(err.statusCode);
+  }
+  res.status(err.statusCode).json({ success: false, message: err.message });
 };
 
 module.exports = { notFound, methodNotAllowed, genericErrorHandler };
