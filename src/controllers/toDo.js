@@ -12,13 +12,13 @@ const logger = require('../utils/logger');
 const search = async (req, res, next) => {
   const searchQuery = req.query['q'];
 
-  const sqlQuery = searchQuery ? 'SELECT * from todos where LOWER(title) LIKE $1' : 'SELECT * from todos';
+  const sqlQuery = searchQuery ? 'SELECT * FROM todos WHERE LOWER(title) LIKE $1' : 'SELECT * FROM todos';
   const values = searchQuery ? ['%' + searchQuery.toLowerCase() + '%'] : [];
 
   try {
     const result = await pool.query(sqlQuery, values);
 
-    res.json(result.rows);
+    res.json({ success: true, rows: result.rows });
   } catch (err) {
     next(err);
     logger.error(err);
@@ -33,13 +33,18 @@ const search = async (req, res, next) => {
  * @param {Object} res
  * @param {Function} next
  */
-const add = (req, res, next) => {
+const add = async (req, res, next) => {
+  const sqlQuery = 'INSERT INTO todos(title, is_complete) VALUES($1, $2)';
+  const { title, is_complete: isComplete } = req.body;
+  const values = [title, isComplete];
+
   try {
-    //  console.log('ssss');
+    await pool.query(sqlQuery, values);
   } catch (err) {
+    next(err);
     logger.error(err);
   }
-  res.json({ message: 'hee' });
+  res.json({ success: true });
 };
 
 module.exports = { search, add };
