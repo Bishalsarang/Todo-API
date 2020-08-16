@@ -18,7 +18,7 @@ const search = async (req, res, next) => {
   try {
     const result = await pool.query(sqlQuery, values);
 
-    res.json({ success: true, rows: result.rows });
+    res.json({ success: true, data: result.rows });
   } catch (err) {
     next(err);
     logger.error(err);

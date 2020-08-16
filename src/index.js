@@ -28,9 +28,12 @@ app.get('/', (req, res) => {
 });
 
 app.use(errorHandler.genericErrorHandler);
-// app.use(errorHandler.methodNotAllowed);
 app.use(errorHandler.notFound);
 
-app.listen(app.get('port'), app.get('host'), () =>
-  logger.info(`Server running on http://${app.get('host')}:${app.get('port')}`),
-);
+app.listen(app.get('port'), app.get('host'), (err) => {
+  if (err) {
+    logger.error('Unable to start server', err.trace);
+  } else {
+    logger.info(`Server running on http://${app.get('host')}:${app.get('port')}`);
+  }
+});

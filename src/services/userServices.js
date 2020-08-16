@@ -11,4 +11,30 @@ const createUser = async ({ name, email, password }) => {
   }
 };
 
-module.exports = { createUser };
+const getHashedPassword = async (email) => {
+  const sqlQuery = 'SELECT password FROM users WHERE email=$1';
+  const values = [email];
+
+  try {
+    const result = await pool.query(sqlQuery, values);
+
+    return result.rows[0].password;
+  } catch (err) {
+    return null;
+  }
+};
+
+const isEmailExist = async (email) => {
+  const sqlQuery = 'SELECT COUNT(*) FROM users WHERE email=$1';
+  const values = [email];
+
+  try {
+    const result = await pool.query(sqlQuery, values);
+
+    return parseInt(result.rows[0].count) === 1;
+  } catch (err) {
+    return null;
+  }
+};
+
+module.exports = { createUser, getHashedPassword, isEmailExist };
