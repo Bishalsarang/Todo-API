@@ -5,3 +5,10 @@ CREATE TABLE IF NOT EXISTS todos (
    is_complete BOOLEAN,
    description TEXT
 );
+
+CREATE TABLE IF NOT EXISTS users (
+   user_id SERIAL PRIMARY KEY,
+   name VARCHAR(255),
+   email VARCHAR(255) UNIQUE,
+   password VARCHAR(255)
+);

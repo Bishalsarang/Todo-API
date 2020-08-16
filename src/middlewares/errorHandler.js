@@ -24,7 +24,7 @@ const genericErrorHandler = (err, req, res, next) => {
   logger.error(err.message);
   if (!err.statusCode) {
     err.statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
-    err.message = HttpStatus.getStatusText(err.statusCode);
+    err.message = err.message || HttpStatus.getStatusText(err.statusCode);
   }
   res.status(err.statusCode).json({ success: false, message: err.message });
 };
