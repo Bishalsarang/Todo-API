@@ -7,9 +7,9 @@ router.route('/').get(toDoController.search).post(toDoController.add).all(errorH
 
 router
   .route('/:id') //
-  .get(toDoController.readToDo) // Read
-  .put(toDoController.updateToDo) // Update
-  .delete(toDoController.deleteToDo) // Delete
+  .get(toDoController.read) // Read
+  .put(toDoController.update) // Update
+  .delete(toDoController.del) // Delete
   .all(errorHandler.methodNotAllowed);
 
 module.exports = router;

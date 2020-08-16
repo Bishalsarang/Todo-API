@@ -1,4 +1,6 @@
 const jwt = require('jsonwebtoken');
+const { HttpError } = require('http-errors');
+const httpStatusCodes = require('http-status-codes');
 
 const isAuthenticated = async (req, res, next) => {
   const token =
@@ -9,11 +11,11 @@ const isAuthenticated = async (req, res, next) => {
       const isValidToken = await jwt.verify(token, process.env.SECRET_KEY);
 
       if (!isValidToken) {
-        throw new Error('Invalid access token');
+        throw new HttpError(httpStatusCodes.UNAUTHORIZED, 'Not authorized. Try to login again ');
       }
       next();
     } else {
-      throw new Error('No token available');
+      throw new HttpError(httpStatusCodes.UNAUTHORIZED, 'Not authorized. Try to login again ');
     }
   } catch (err) {
     next(err);

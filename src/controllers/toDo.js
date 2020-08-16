@@ -1,5 +1,7 @@
-const pool = require('../db');
-const logger = require('../utils/logger');
+const { HttpError } = require('http-errors');
+const httpStatusCodes = require('http-status-codes');
+
+const toDoServices = require('../services/toDoServices');
 
 /**
  * Search todos : If a query q is present, a case-insensitive search is made on database.
@@ -12,16 +14,16 @@ const logger = require('../utils/logger');
 const search = async (req, res, next) => {
   const searchQuery = req.query['q'];
 
-  const sqlQuery = searchQuery ? 'SELECT * FROM todos WHERE LOWER(title) LIKE $1' : 'SELECT * FROM todos';
-  const values = searchQuery ? ['%' + searchQuery.toLowerCase() + '%'] : [];
-
   try {
-    const result = await pool.query(sqlQuery, values);
+    const toDos = await toDoServices.getToDos(searchQuery);
 
-    res.json({ success: true, data: result.rows });
+    if (!toDos) {
+      throw new HttpError('Unable to fetch database');
+    }
+
+    res.json({ success: true, data: toDos });
   } catch (err) {
     next(err);
-    logger.error(err);
   }
 };
 
@@ -33,54 +35,52 @@ const search = async (req, res, next) => {
  * @param {Function} next
  */
 const add = async (req, res, next) => {
-  const sqlQuery = 'INSERT INTO todos(title, is_complete) VALUES($1, $2)';
-  const { title, is_complete: isComplete } = req.body;
-  const values = [title, isComplete];
-
   try {
-    await pool.query(sqlQuery, values);
-  } catch (err) {
-    next(err);
-    logger.error(err);
-  }
-  res.json({ success: true });
-};
+    const result = await toDoServices.addToDo(req.body);
 
-const readToDo = async (req, res, next) => {
-  const sqlQuery = 'SELECT * FROM todos where todo_id=$1';
-  const values = [req.params.id];
+    if (!result) {
+      throw new HttpError('Unable to insert into database');
+    }
 
-  try {
-    const result = await pool.query(sqlQuery, values);
-
-    res.json({ success: true, row: result.rows[0] });
+    res.status(httpStatusCodes.CREATED).json({ success: true });
   } catch (err) {
     next(err);
   }
 };
 
-const deleteToDo = async (req, res, next) => {
-  const sqlQuery = 'DELETE FROM todos where todo_id=$1';
-  const values = [req.params.id];
-
+const read = async (req, res, next) => {
   try {
-    await pool.query(sqlQuery, values);
-    res.json({ success: true });
+    const row = await toDoServices.readToDo(req.params);
+
+    res.json({ success: true, data: row });
   } catch (err) {
     next(err);
   }
 };
 
-const updateToDo = async (req, res, next) => {
-  const sqlQuery = 'UPDATE todos SET title=$1, is_complete=$2 WHERE todo_id=$3';
-
-  const { title, is_complete: isComplete } = req.body;
-
-  const values = [title, isComplete, req.params.id];
-
+const del = async (req, res, next) => {
   try {
-    await pool.query(sqlQuery, values);
-    res.json({ success: true });
+    const result = await toDoServices.deleteToDo(req.params);
+
+    if (!result) {
+      throw new HttpError('Unable to delete from database');
+    }
+
+    res.status(httpStatusCodes.NO_CONTENT).json({ success: true });
+  } catch (err) {
+    next(err);
+  }
+};
+
+const update = async (req, res, next) => {
+  try {
+    const result = await toDoServices.updateToDo({ ...req.params, ...req.body });
+
+    if (!result) {
+      throw new HttpError('Unable to update the row');
+    }
+
+    res.status(httpStatusCodes.CREATED).json({ success: true });
   } catch (err) {
     next(err);
   }
@@ -88,8 +88,8 @@ const updateToDo = async (req, res, next) => {
 
 module.exports = {
   add,
+  del,
+  read,
   search,
-  readToDo,
-  deleteToDo,
-  updateToDo,
+  update,
 };
