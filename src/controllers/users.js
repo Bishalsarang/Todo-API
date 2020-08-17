@@ -3,7 +3,13 @@ const bcrypt = require('bcrypt');
 const httpStatus = require('http-status-codes');
 
 const userServices = require('../services/userServices');
-const { generateAccessToken, generateRefreshToken, sendRefreshToken, verifyToken } = require('../utils/auth.utils');
+const {
+  generateAccessToken,
+  generateRefreshToken,
+  sendRefreshToken,
+  verifyToken,
+  clearRefreshToken,
+} = require('../utils/auth.utils');
 
 const register = async (req, res, next) => {
   const saltRounds = parseInt(process.env.SALT_ROUNDS);
@@ -63,6 +69,18 @@ const login = async (req, res, next) => {
   }
 };
 
+const logOut = (req, res, next) => {
+  try {
+    clearRefreshToken(res);
+    res.json({
+      success: true,
+      message: 'Successfully logged out',
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 const refreshToken = async (req, res, next) => {
   if (!req.headers) {
     throw new Error('No headers');
@@ -88,4 +106,4 @@ const refreshToken = async (req, res, next) => {
   }
 };
 
-module.exports = { register, login, refreshToken };
+module.exports = { register, login, logOut, refreshToken };

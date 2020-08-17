@@ -1,3 +1,5 @@
+const { v4: uuid } = require('uuid');
+
 const pool = require('../db');
 
 const getToDos = async (searchQuery) => {
@@ -13,10 +15,13 @@ const getToDos = async (searchQuery) => {
   }
 };
 
-const addToDo = async ({ title, is_complete: isComplete }) => {
-  const sqlQuery = 'INSERT INTO todos(title, is_complete) VALUES($1, $2)';
+const addToDo = async ({ title, isComplete }) => {
+  const id = uuid();
 
-  const values = [title, isComplete];
+  // console.log('Helllo id', uuid());
+  const sqlQuery = 'INSERT INTO todos(id, title, isComplete) VALUES($1, $2, $3)';
+
+  const values = [id, title, isComplete];
 
   try {
     return await pool.query(sqlQuery, values);
@@ -26,7 +31,7 @@ const addToDo = async ({ title, is_complete: isComplete }) => {
 };
 
 const readToDo = async ({ id }) => {
-  const sqlQuery = 'SELECT * FROM todos where todo_id=$1';
+  const sqlQuery = 'SELECT * FROM todos where id=$1';
   const values = [id];
 
   try {
@@ -39,7 +44,7 @@ const readToDo = async ({ id }) => {
 };
 
 const deleteToDo = async ({ id }) => {
-  const sqlQuery = 'DELETE FROM todos where todo_id=$1';
+  const sqlQuery = 'DELETE FROM todos where id=$1';
   const values = [id];
 
   try {
@@ -49,8 +54,8 @@ const deleteToDo = async ({ id }) => {
   }
 };
 
-const updateToDo = async ({ title, is_complete: isComplete, id }) => {
-  const sqlQuery = 'UPDATE todos SET title=$1, is_complete=$2 WHERE todo_id=$3';
+const updateToDo = async ({ title, isComplete, id }) => {
+  const sqlQuery = 'UPDATE todos SET title=$1, isComplete=$2 WHERE id=$3';
   const values = [title, isComplete, id];
 
   try {

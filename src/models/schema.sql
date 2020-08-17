@@ -1,8 +1,9 @@
 -- -- todos table schema
 CREATE TABLE IF NOT EXISTS todos (
-   todo_id SERIAL PRIMARY KEY,
+   id VARCHAR(255) PRIMARY KEY,
    title VARCHAR(255),
-   is_complete BOOLEAN,
+   isComplete BOOLEAN,
+   priority VARCHAR(20) DEFAULT 'low',
    description TEXT
 );
 
