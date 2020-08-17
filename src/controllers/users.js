@@ -1,8 +1,9 @@
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
+
 const httpStatus = require('http-status-codes');
 
 const userServices = require('../services/userServices');
+const { generateAccessToken, generateRefreshToken, sendRefreshToken, verifyToken } = require('../utils/auth.utils');
 
 const register = async (req, res, next) => {
   const saltRounds = parseInt(process.env.SALT_ROUNDS);
@@ -37,7 +38,7 @@ const login = async (req, res, next) => {
     const isEmailExist = await userServices.isEmailExist(email);
 
     if (!isEmailExist) {
-      throw new Error("Email or password doesn't match");
+      throw new Error("Email  doesn't exist");
     }
 
     const hashedPassword = await userServices.getHashedPassword(email);
@@ -48,7 +49,13 @@ const login = async (req, res, next) => {
       throw new Error("Email or password doesn't match");
     }
 
-    const token = jwt.sign({ name, email }, process.env.SECRET_KEY);
+    const token = generateAccessToken({ name, email });
+    const refreshToken = generateRefreshToken({ name, email });
+
+    sendRefreshToken(res, refreshToken);
+    if (!userServices.setRefreshToken(refreshToken, email)) {
+      throw new Error('Unable to set refresh token');
+    }
 
     res.json({ success: true, message: `Successfully logged in`, token });
   } catch (err) {
@@ -56,4 +63,29 @@ const login = async (req, res, next) => {
   }
 };
 
-module.exports = { register, login };
+const refreshToken = async (req, res, next) => {
+  if (!req.headers) {
+    throw new Error('No headers');
+  }
+
+  if (!req.headers.cookie) {
+    throw new Error('NO cookie in header');
+  }
+
+  const token = req.headers.cookie.split('=')[1];
+
+  let payload = null;
+
+  try {
+    if (!token) {
+      throw new Error('No valid refresh tokens');
+    }
+    payload = await verifyToken(token, process.env.REFRESH_SECRET_KEY);
+
+    res.json({ message: 'refresh', data: payload });
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports = { register, login, refreshToken };

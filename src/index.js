@@ -1,11 +1,11 @@
 const express = require('express');
 const app = express();
 
+const cors = require('cors');
 const morgan = require('morgan');
-const routes = require('./routes');
-
 const bodyParser = require('body-parser');
 
+const routes = require('./routes');
 const logger = require('./utils/logger');
 const errorHandler = require('./middlewares/errorHandler');
 
@@ -15,6 +15,8 @@ app.set('host', process.env.APP_HOST);
 app.set('port', process.env.APP_PORT);
 
 // Middleware
+// app.options('*', cors());
+app.use(cors({ credentials: true, origin: 'http://localhost:3000' }));
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(bodyParser.json());

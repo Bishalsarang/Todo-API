@@ -1,6 +1,6 @@
-const jwt = require('jsonwebtoken');
-const { HttpError } = require('http-errors');
 const httpStatusCodes = require('http-status-codes');
+
+const { verifyToken } = require('../utils/auth.utils');
 
 const isAuthenticated = async (req, res, next) => {
   const token =
@@ -8,14 +8,20 @@ const isAuthenticated = async (req, res, next) => {
 
   try {
     if (token) {
-      const isValidToken = await jwt.verify(token, process.env.SECRET_KEY);
+      const isValidToken = await verifyToken(token);
 
       if (!isValidToken) {
-        throw new HttpError(httpStatusCodes.UNAUTHORIZED, 'Not authorized. Try to login again ');
+        const err = new Error('Not authorized. Try to login again ');
+
+        err.statusCode = httpStatusCodes.UNAUTHORIZED;
+        throw err;
       }
       next();
     } else {
-      throw new HttpError(httpStatusCodes.UNAUTHORIZED, 'Not authorized. Try to login again ');
+      const err = new Error('Not authorized. Try to login again ');
+
+      err.statusCode = httpStatusCodes.UNAUTHORIZED;
+      throw err;
     }
   } catch (err) {
     next(err);

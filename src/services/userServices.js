@@ -11,6 +11,17 @@ const createUser = async ({ name, email, password }) => {
   }
 };
 
+const setRefreshToken = async (refreshToken, email) => {
+  const sqlQuery = 'UPDATE users SET refreshToken=$1 WHERE email=$2';
+  const values = [refreshToken, email];
+
+  try {
+    return await pool.query(sqlQuery, values);
+  } catch (err) {
+    return null;
+  }
+};
+
 const getHashedPassword = async (email) => {
   const sqlQuery = 'SELECT password FROM users WHERE email=$1';
   const values = [email];
@@ -37,4 +48,4 @@ const isEmailExist = async (email) => {
   }
 };
 
-module.exports = { createUser, getHashedPassword, isEmailExist };
+module.exports = { createUser, getHashedPassword, isEmailExist, setRefreshToken };
