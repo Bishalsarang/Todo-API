@@ -15,13 +15,10 @@ const getToDos = async (searchQuery) => {
   }
 };
 
-const addToDo = async ({ title, isComplete }) => {
-  const id = uuid();
+const addToDo = async ({ title, is_complete: isComplete, id }) => {
+  const sqlQuery = 'INSERT INTO todos(id, title, is_complete) VALUES($1, $2, $3)';
 
-  // console.log('Helllo id', uuid());
-  const sqlQuery = 'INSERT INTO todos(id, title, isComplete) VALUES($1, $2, $3)';
-
-  const values = [id, title, isComplete];
+  const values = [id || uuid(), title, isComplete];
 
   try {
     return await pool.query(sqlQuery, values);
@@ -54,9 +51,9 @@ const deleteToDo = async ({ id }) => {
   }
 };
 
-const updateToDo = async ({ title, isComplete, id }) => {
-  const sqlQuery = 'UPDATE todos SET title=$1, isComplete=$2 WHERE id=$3';
-  const values = [title, isComplete, id];
+const updateToDo = async ({ title, is_complete: isComplete, priority, id }) => {
+  const sqlQuery = 'UPDATE todos SET title=$1, is_complete=$2, priority=$3 WHERE id=$4';
+  const values = [title, isComplete, priority, id];
 
   try {
     return await pool.query(sqlQuery, values);
