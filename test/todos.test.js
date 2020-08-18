@@ -12,8 +12,14 @@ chai.use(chaiHttp);
 
 // Initially token is null
 let token = null;
+const creds = {
+  name: 'Bishal',
+  email: 'sarangbishal@gmail.com',
+  password: 'Aha!a3hui#',
+};
 
 userServices.emptyUsers();
+
 toDoServices.emptyToDo();
 // Use Related Tests
 describe('Users', () => {
@@ -23,11 +29,7 @@ describe('Users', () => {
       chai
         .request(server)
         .post('/api/users/register')
-        .send({
-          name: 'Bishal',
-          email: 'sarangbishal@gmails.com',
-          password: 'hello',
-        })
+        .send(creds)
         .end((err, res) => {
           res.should.have.status(201);
           res.body.should.have.property('message');
@@ -44,11 +46,7 @@ describe('Users', () => {
       chai
         .request(server)
         .post('/api/users/login')
-        .send({
-          name: 'Bishal',
-          email: 'sarangbishal@gmails.com',
-          password: 'hello',
-        })
+        .send(creds)
         .end((err, res) => {
           res.should.have.status(200);
           res.body.should.have.property('message');

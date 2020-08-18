@@ -1,8 +1,9 @@
 const bcrypt = require('bcrypt');
-
 const httpStatus = require('http-status-codes');
+const { validationResult } = require('express-validator');
 
 const userServices = require('../services/userServices');
+
 const {
   verifyToken,
   sendRefreshToken,
@@ -16,6 +17,12 @@ const register = async (req, res, next) => {
   const { name, email, password } = req.body;
 
   try {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      throw new Error(JSON.stringify(errors.errors));
+    }
+
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
     const result = await userServices.createUser({
@@ -24,9 +31,8 @@ const register = async (req, res, next) => {
       password: hashedPassword,
     });
 
-    //  If user account can't be created
-    if (!result) {
-      throw new Error('Unable to create new account');
+    if (result.severity === 'ERROR') {
+      throw new Error(result.detail);
     }
 
     res
@@ -41,14 +47,23 @@ const login = async (req, res, next) => {
   const { email, password } = req.body;
 
   try {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      throw new Error(JSON.stringify(errors.errors));
+    }
+
     const isEmailExist = await userServices.isEmailExist(email);
 
-    if (!isEmailExist) {
+    if (isEmailExist.severity === 'Error' || !isEmailExist) {
       throw new Error("Email  doesn't exist");
     }
 
     const hashedPassword = await userServices.getHashedPassword(email);
 
+    if (hashedPassword.severity === 'Error' || !hashedPassword) {
+      throw new Error("Email  or password doesn't match");
+    }
     const isValidPassword = await bcrypt.compare(password, hashedPassword);
 
     if (!isValidPassword) {

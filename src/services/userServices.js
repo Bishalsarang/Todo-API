@@ -8,7 +8,7 @@ const emptyUsers = async () => {
   } catch (err) {
     console.error(err);
 
-    return null;
+    return err;
   }
 };
 
@@ -19,7 +19,7 @@ const createUser = async ({ name, email, password }) => {
   try {
     return await pool.query(sqlQuery, values);
   } catch (err) {
-    return null;
+    return err;
   }
 };
 
@@ -30,7 +30,7 @@ const setRefreshToken = async (refreshToken, email) => {
   try {
     return await pool.query(sqlQuery, values);
   } catch (err) {
-    return null;
+    return err;
   }
 };
 
@@ -43,7 +43,7 @@ const getHashedPassword = async (email) => {
 
     return result.rows[0].password;
   } catch (err) {
-    return null;
+    return err;
   }
 };
 
@@ -56,7 +56,7 @@ const isEmailExist = async (email) => {
 
     return parseInt(result.rows[0].count) === 1;
   } catch (err) {
-    return null;
+    return err;
   }
 };
 
