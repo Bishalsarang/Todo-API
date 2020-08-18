@@ -132,10 +132,10 @@ describe('Todos', () => {
     it('it should return 201 as user is  authenticated to add a todo', (done) => {
       chai
         .request(server)
-        .post('/api/todos', {
-          title: 'Test Assignment',
+        .post('/api/todos')
+        .send({
+          title: 'Hawa Assignmsents IIII',
           is_complete: false,
-          user_email: 'sarangbishal@gmails.com',
         })
         .set({ authorization: token })
         .end((err, res) => {

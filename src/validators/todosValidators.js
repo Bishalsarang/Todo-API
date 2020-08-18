@@ -1,8 +1,5 @@
 const { body } = require('express-validator');
 
-const toDoValidators = [
-  body('title').not().isEmpty().trim().escape().withMessage('Title Should be valid'),
-  body('is_complete').not().isEmpty().trim().escape(),
-];
+const toDoValidators = [body('title').notEmpty().isLength({ min: 2 }), body('is_complete').isBoolean()];
 
 module.exports = toDoValidators;

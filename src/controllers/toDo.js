@@ -1,5 +1,6 @@
 const { HttpError } = require('http-errors');
 const httpStatusCodes = require('http-status-codes');
+const { validationResult } = require('express-validator');
 
 const { getUserEmail } = require('../utils/auth.utils');
 const toDoServices = require('../services/toDoServices');
@@ -38,6 +39,13 @@ const search = async (req, res, next) => {
  */
 const add = async (req, res, next) => {
   try {
+    const errors = validationResult(req);
+
+    console.log(req.body);
+    console.log('aa', errors);
+    if (!errors.isEmpty()) {
+      throw new Error(JSON.stringify(errors.errors));
+    }
     const email = await getUserEmail(req);
     const result = await toDoServices.addToDo({ ...req.body, user_email: email });
 

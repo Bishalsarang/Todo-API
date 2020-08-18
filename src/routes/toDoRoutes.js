@@ -2,8 +2,13 @@ const router = require('express').Router();
 
 const toDoController = require('../controllers/toDo');
 const errorHandler = require('../middlewares/errorHandler');
+const toDoValidators = require('../validators/todosValidators');
 
-router.route('/').get(toDoController.search).post(toDoController.add).all(errorHandler.methodNotAllowed);
+router
+  .route('/')
+  .get(toDoController.search)
+  .post(toDoValidators, toDoController.add)
+  .all(errorHandler.methodNotAllowed);
 
 router
   .route('/:id') //
