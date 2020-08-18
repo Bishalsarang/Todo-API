@@ -41,8 +41,6 @@ const add = async (req, res, next) => {
   try {
     const errors = validationResult(req);
 
-    console.log(req.body);
-    console.log('aa', errors);
     if (!errors.isEmpty()) {
       throw new Error(JSON.stringify(errors.errors));
     }
