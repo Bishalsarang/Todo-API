@@ -4,11 +4,11 @@ const httpStatus = require('http-status-codes');
 
 const userServices = require('../services/userServices');
 const {
+  verifyToken,
+  sendRefreshToken,
+  clearRefreshToken,
   generateAccessToken,
   generateRefreshToken,
-  sendRefreshToken,
-  verifyToken,
-  clearRefreshToken,
 } = require('../utils/auth.utils');
 
 const register = async (req, res, next) => {
@@ -38,7 +38,7 @@ const register = async (req, res, next) => {
 };
 
 const login = async (req, res, next) => {
-  const { name, email, password } = req.body;
+  const { email, password } = req.body;
 
   try {
     const isEmailExist = await userServices.isEmailExist(email);
@@ -55,8 +55,8 @@ const login = async (req, res, next) => {
       throw new Error("Email or password doesn't match");
     }
 
-    const token = generateAccessToken({ name, email });
-    const refreshToken = generateRefreshToken({ name, email });
+    const token = generateAccessToken({ email });
+    const refreshToken = generateRefreshToken({ email });
 
     sendRefreshToken(res, refreshToken);
     if (!userServices.setRefreshToken(refreshToken, email)) {

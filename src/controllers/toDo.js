@@ -1,6 +1,7 @@
 const { HttpError } = require('http-errors');
 const httpStatusCodes = require('http-status-codes');
 
+const { getUserEmail } = require('../utils/auth.utils');
 const toDoServices = require('../services/toDoServices');
 
 /**
@@ -15,7 +16,8 @@ const search = async (req, res, next) => {
   const searchQuery = req.query['q'];
 
   try {
-    const toDos = await toDoServices.getToDos(searchQuery);
+    const email = await getUserEmail(req);
+    const toDos = await toDoServices.getToDos(searchQuery, email);
 
     if (!toDos) {
       throw new HttpError('Unable to fetch database');
@@ -36,7 +38,8 @@ const search = async (req, res, next) => {
  */
 const add = async (req, res, next) => {
   try {
-    const result = await toDoServices.addToDo(req.body);
+    const email = await getUserEmail(req);
+    const result = await toDoServices.addToDo({ ...req.body, user_email: email });
 
     if (!result) {
       throw new HttpError('Unable to insert into database');
@@ -50,7 +53,8 @@ const add = async (req, res, next) => {
 
 const read = async (req, res, next) => {
   try {
-    const row = await toDoServices.readToDo(req.params);
+    const email = await getUserEmail(req);
+    const row = await toDoServices.readToDo({ ...req.params, user_email: email });
 
     res.json({ success: true, data: row });
   } catch (err) {
@@ -60,7 +64,8 @@ const read = async (req, res, next) => {
 
 const del = async (req, res, next) => {
   try {
-    const result = await toDoServices.deleteToDo(req.params);
+    const email = await getUserEmail(req);
+    const result = await toDoServices.deleteToDo({ ...req.params, user_email: email });
 
     if (!result) {
       throw new HttpError('Unable to delete from database');
@@ -74,7 +79,8 @@ const del = async (req, res, next) => {
 
 const update = async (req, res, next) => {
   try {
-    const result = await toDoServices.updateToDo({ ...req.params, ...req.body });
+    const email = await getUserEmail(req);
+    const result = await toDoServices.updateToDo({ ...req.params, ...req.body, user_email: email });
 
     if (!result) {
       throw new HttpError('Unable to update the row');

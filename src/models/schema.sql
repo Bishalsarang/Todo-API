@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS todos (
    title VARCHAR(255),
    is_complete BOOLEAN DEFAULT FALSE,
    priority VARCHAR(20) DEFAULT 'low',
+   user_email VARCHAR,
    description TEXT
 );
 
@@ -12,5 +13,5 @@ CREATE TABLE IF NOT EXISTS users (
    name VARCHAR(255),
    email VARCHAR(255) UNIQUE,
    password VARCHAR(255),
-   refresh_token VARCHAR(255)
+   refresh_token VARCHA(255)
 );
