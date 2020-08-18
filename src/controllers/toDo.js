@@ -56,6 +56,12 @@ const read = async (req, res, next) => {
     const email = await getUserEmail(req);
     const row = await toDoServices.readToDo({ ...req.params, user_email: email });
 
+    if (!row) {
+      const err = new Error('Requested id not found');
+
+      err.statusCode = 404;
+      throw err;
+    }
     res.json({ success: true, data: row });
   } catch (err) {
     next(err);

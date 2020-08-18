@@ -2,6 +2,18 @@ const { v4: uuid } = require('uuid');
 
 const pool = require('../db');
 
+const emptyToDo = async () => {
+  const sqlQuery = 'DELETE from todos';
+
+  try {
+    await pool.query(sqlQuery);
+  } catch (err) {
+    console.error(err);
+
+    return null;
+  }
+};
+
 const getToDos = async (searchQuery, userEmail) => {
   const sqlQuery = searchQuery
     ? 'SELECT * FROM todos WHERE user_email=$1 AND LOWER(title) LIKE $2'
@@ -40,6 +52,13 @@ const readToDo = async ({ id, user_email: userEmail }) => {
   try {
     const result = await pool.query(sqlQuery, values);
 
+    if (!result.rows.length) {
+      const err = new Error('Requested id not found');
+
+      err.status = 404;
+      throw err;
+    }
+
     return result.rows[0];
   } catch (err) {
     return null;
@@ -72,4 +91,4 @@ const updateToDo = async ({ title, is_complete: isComplete, priority, id, user_e
   }
 };
 
-module.exports = { getToDos, addToDo, updateToDo, readToDo, deleteToDo };
+module.exports = { getToDos, addToDo, updateToDo, readToDo, deleteToDo, emptyToDo };

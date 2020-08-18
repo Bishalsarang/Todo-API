@@ -1,5 +1,17 @@
 const pool = require('../db');
 
+const emptyUsers = async () => {
+  const sqlQuery = 'DELETE from users';
+
+  try {
+    await pool.query(sqlQuery);
+  } catch (err) {
+    console.error(err);
+
+    return null;
+  }
+};
+
 const createUser = async ({ name, email, password }) => {
   const sqlQuery = 'INSERT INTO users(name, email, password) VALUES($1, $2, $3)';
   const values = [name, email, password];
@@ -48,4 +60,4 @@ const isEmailExist = async (email) => {
   }
 };
 
-module.exports = { createUser, getHashedPassword, isEmailExist, setRefreshToken };
+module.exports = { createUser, getHashedPassword, isEmailExist, setRefreshToken, emptyUsers };

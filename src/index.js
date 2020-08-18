@@ -39,3 +39,5 @@ app.listen(app.get('port'), app.get('host'), (err) => {
     logger.info(`Server running on http://${app.get('host')}:${app.get('port')}`);
   }
 });
+
+module.exports = app;
